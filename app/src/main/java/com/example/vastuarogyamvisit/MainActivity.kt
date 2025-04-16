@@ -164,7 +164,10 @@ class MainActivity : ComponentActivity() {
     // PDF generation logic
     private fun generatePdf(name: String, email: String, phone: String, image: Bitmap?) {
         try {
-            val pdfFile = File(getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "user_data.pdf")
+//            val pdfFile = File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "visit_data.pdf")
+            val timestamp = System.currentTimeMillis()
+            val fileName = "user_data_$timestamp.pdf"
+            val pdfFile = File(getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
             val pdfWriter = PdfWriter(pdfFile)
             val pdfDocument = PdfDocument(pdfWriter)
             val document = Document(pdfDocument)
