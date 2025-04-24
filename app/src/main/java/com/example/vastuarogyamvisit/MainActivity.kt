@@ -14,6 +14,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -61,6 +65,7 @@ class MainActivity : ComponentActivity() {
         var name by remember { mutableStateOf("") }
         var email by remember { mutableStateOf("") }
         var phone by remember { mutableStateOf("") }
+        var selectedOption by remember { mutableStateOf("Option A") }
 
         Column(
             modifier = modifier
@@ -95,6 +100,17 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // Dropdown for selecting an option
+            Text("Select a Report Type:")
+            DropdownMenuWithSelection(
+                label = "Choose an option",
+                options = listOf("Option A", "Option B", "Option C")
+            ) { selection ->
+                selectedOption = selection
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Capture Image Button
             Button(onClick = { openCamera() }) {
                 Text("Capture Image")
@@ -110,8 +126,48 @@ class MainActivity : ComponentActivity() {
             }
 
             // Generate PDF button
-            Button(onClick = { generatePdf(name, email, phone, capturedImage) }) {
+            Button(onClick = { generatePdf(name, email, phone, capturedImage, selectedOption) }) {
                 Text("Generate PDF")
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun DropdownMenuWithSelection(
+        label: String,
+        options: List<String>,
+        onSelected: (String) -> Unit
+    ) {
+        var expanded by remember { mutableStateOf(false) }
+        var selectedOption by remember { mutableStateOf(options.first()) }
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            TextField(
+                readOnly = true,
+                value = selectedOption,
+                onValueChange = {},
+                label = { Text(label) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.menuAnchor()
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.forEach { selectionOption ->
+                    DropdownMenuItem(
+                        text = { Text(selectionOption) },
+                        onClick = {
+                            selectedOption = selectionOption
+                            expanded = false
+                            onSelected(selectionOption)
+                        }
+                    )
+                }
             }
         }
     }
@@ -162,7 +218,7 @@ class MainActivity : ComponentActivity() {
     }
 
     // PDF generation logic
-    private fun generatePdf(name: String, email: String, phone: String, image: Bitmap?) {
+    private fun generatePdf(name: String, email: String, phone: String, image: Bitmap?, selectedOption: String) {
         try {
 //            val pdfFile = File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "visit_data.pdf")
             val timestamp = System.currentTimeMillis()
@@ -176,6 +232,7 @@ class MainActivity : ComponentActivity() {
             document.add(Paragraph("Name: $name"))
             document.add(Paragraph("Email: $email"))
             document.add(Paragraph("Phone: $phone"))
+            document.add(Paragraph("Selected Option: $selectedOption"))
 
             // Add image if available
             image?.let {
