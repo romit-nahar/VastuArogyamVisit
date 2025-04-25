@@ -1,10 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- External app specific directories -->
     <external-files-path
-        name="my_docs"
+        name="documents"
         path="Documents/" />
 
     <external-files-path
-        name="my_pictures"
+        name="pictures"
         path="Pictures/" />
+
+    <external-files-path
+        name="vastu_reports"
+        path="VastuArogyam/Reports/" />
+
+    <external-files-path
+        name="vastu_images"
+        path="VastuArogyam/Images/" />
+
+    <!-- External public directories -->
+    <external-path
+        name="external_downloads"
+        path="Download/VastuArogyam/Reports/" />
+
+    <external-path
+        name="external_pictures"
+        path="Pictures/VastuArogyam/Images/" />
+
+    <!-- Cache directory -->
+    <cache-path
+        name="cache"
+        path="/" />
 </paths>

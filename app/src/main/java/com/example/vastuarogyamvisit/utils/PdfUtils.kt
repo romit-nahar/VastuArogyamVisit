@@ -1,0 +1,135 @@
+package com.example.vastuarogyamvisit.utils
+
+import android.content.Context
+import android.graphics.Bitmap
+import android.os.Environment
+import android.widget.Toast
+import com.example.vastuarogyamvisit.model.VisitFormData
+import com.itextpdf.io.image.ImageDataFactory
+import com.itextpdf.kernel.colors.ColorConstants
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Cell
+import com.itextpdf.layout.element.Image as PdfImage
+import com.itextpdf.layout.element.Paragraph
+import com.itextpdf.layout.element.Table
+import com.itextpdf.layout.property.TextAlignment
+import com.itextpdf.layout.property.UnitValue
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+
+/**
+ * Utility class for PDF operations
+ */
+object PdfUtils {
+
+    /**
+     * Generates a PDF document with the visit form data
+     *
+     * @param context The application context
+     * @param formData The form data to include in the PDF
+     * @return File object pointing to the generated PDF, or null if generation failed
+     */
+    fun generatePdf(context: Context, formData: VisitFormData): File? {
+        try {
+            // Create timestamp for unique filename
+            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+            val fileName = "${FileConstants.PDF_FILE_PREFIX}${timestamp}.pdf"
+
+            // Create directory if it doesn't exist
+            val storageDir = File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                FileConstants.PDF_DIRECTORY
+            )
+            if (!storageDir.exists()) {
+                storageDir.mkdirs()
+            }
+
+            // Create file
+            val pdfFile = File(storageDir, fileName)
+            val pdfWriter = PdfWriter(pdfFile)
+            val pdfDocument = PdfDocument(pdfWriter)
+            val document = Document(pdfDocument)
+
+            // Add title
+            val title = Paragraph("Vastu Arogyam Visit Report")
+                .setFontSize(18f)
+                .setBold()
+                .setTextAlignment(TextAlignment.CENTER)
+            document.add(title)
+
+            // Add date
+            val dateText = Paragraph("Generated on: ${SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.US).format(Date())}")
+                .setFontSize(10f)
+                .setItalic()
+                .setTextAlignment(TextAlignment.RIGHT)
+            document.add(dateText)
+
+            document.add(Paragraph("\n"))
+
+            // Create table for form data
+            val table = Table(UnitValue.createPercentArray(floatArrayOf(30f, 70f)))
+                .setWidth(UnitValue.createPercentValue(100f))
+
+            // Add rows to table
+            addTableRow(table, "Name", formData.name)
+            addTableRow(table, "Email", formData.email)
+            addTableRow(table, "Phone", formData.phone)
+            addTableRow(table, "Report Type", formData.reportType)
+            addTableRow(table, "Property Type", formData.propertyType)
+            addTableRow(table, "Inspection Category", formData.inspectionCategory)
+            addTableRow(table, "Visit Purpose", formData.visitPurpose)
+            addTableRow(table, "Notes", formData.notes)
+
+            document.add(table)
+
+            // Add image if available
+            formData.capturedImage?.let {
+                document.add(Paragraph("\n"))
+                document.add(Paragraph("Site Image:").setBold())
+
+                val imageData = ImageDataFactory.create(it.toByteArray())
+                val pdfImage = PdfImage(imageData).apply {
+                    scaleToFit(300f, 300f)
+                    setHorizontalAlignment(com.itextpdf.layout.property.HorizontalAlignment.CENTER)
+                }
+                document.add(pdfImage)
+            }
+
+            document.close()
+            return pdfFile
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }
+
+    /**
+     * Adds a row to the table with label and value
+     *
+     * @param table The table to add the row to
+     * @param label The row label
+     * @param value The row value
+     */
+    private fun addTableRow(table: Table, label: String, value: String) {
+        val labelCell = Cell().add(Paragraph(label).setBold())
+        val valueCell = Cell().add(Paragraph(value))
+        table.addCell(labelCell)
+        table.addCell(valueCell)
+    }
+
+    /**
+     * Converts a Bitmap to ByteArray
+     *
+     * @return ByteArray representation of the Bitmap
+     */
+    private fun Bitmap.toByteArray(): ByteArray {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        this.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+        return byteArrayOutputStream.toByteArray()
+    }
+}

@@ -3,168 +3,110 @@ package com.example.vastuarogyamvisit
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.os.Environment.getExternalStoragePublicDirectory
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.example.vastuarogyamvisit.model.VisitFormData
+import com.example.vastuarogyamvisit.ui.components.DropdownSelector
 import com.example.vastuarogyamvisit.ui.theme.VastuArogyamVisitTheme
-import com.itextpdf.io.image.ImageDataFactory
-import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.kernel.pdf.PdfWriter
-import com.itextpdf.layout.Document
-import com.itextpdf.layout.element.Image as PdfImage
-import com.itextpdf.layout.element.Paragraph
-import com.itextpdf.layout.property.TextAlignment
+import com.example.vastuarogyamvisit.utils.DropdownConstants
+import com.example.vastuarogyamvisit.utils.FileConstants
+import com.example.vastuarogyamvisit.utils.PdfUtils
+import com.example.vastuarogyamvisit.utils.PermissionConstants
 import java.io.File
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Main activity for the Vastu Arogyam Visit app
+ */
 class MainActivity : ComponentActivity() {
+    private val TAG = "MainActivity"
+
+    // State variables
     private var photoFile: File? = null
     private var capturedImage: Bitmap? by mutableStateOf(null)
+    private var generatedPdfFile: File? by mutableStateOf(null)
+
+    // Permission launcher
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions.entries.all { it.value }
+        if (allGranted) {
+            Log.d(TAG, "All permissions granted")
+        } else {
+            Toast.makeText(
+                this,
+                "Permissions are necessary for full app functionality",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    // Camera launcher
+    private val captureImageLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            photoFile?.let { file ->
+                try {
+                    val photoUri = FileProvider.getUriForFile(
+                        this,
+                        "${packageName}.provider",
+                        file
+                    )
+                    capturedImage = MediaStore.Images.Media.getBitmap(contentResolver, photoUri)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error processing camera image: ${e.message}")
+                    Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Request necessary permissions
+        requestPermissions()
+
         setContent {
             VastuArogyamVisitTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainContent(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
-
-        requestPermissions()
-    }
-
-    @Composable
-    fun MainContent(modifier: Modifier = Modifier) {
-        var name by remember { mutableStateOf("") }
-        var email by remember { mutableStateOf("") }
-        var phone by remember { mutableStateOf("") }
-        var selectedOption by remember { mutableStateOf("Option A") }
-
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text("Enter details", modifier = Modifier.align(Alignment.Start))
-
-            // Name input
-            TextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Email input
-            TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Phone input
-            TextField(
-                value = phone,
-                onValueChange = { phone = it },
-                label = { Text("Phone Number") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Dropdown for selecting an option
-            Text("Select a Report Type:")
-            DropdownMenuWithSelection(
-                label = "Choose an option",
-                options = listOf("Option A", "Option B", "Option C")
-            ) { selection ->
-                selectedOption = selection
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Capture Image Button
-            Button(onClick = { openCamera() }) {
-                Text("Capture Image")
-            }
-
-            // Display captured image
-            capturedImage?.let {
-                Image(
-                    bitmap = it.asImageBitmap(),
-                    contentDescription = "Captured Image",
-                    modifier = Modifier.size(200.dp)
-                )
-            }
-
-            // Generate PDF button
-            Button(onClick = { generatePdf(name, email, phone, capturedImage, selectedOption) }) {
-                Text("Generate PDF")
-            }
-        }
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun DropdownMenuWithSelection(
-        label: String,
-        options: List<String>,
-        onSelected: (String) -> Unit
-    ) {
-        var expanded by remember { mutableStateOf(false) }
-        var selectedOption by remember { mutableStateOf(options.first()) }
-
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded }
-        ) {
-            TextField(
-                readOnly = true,
-                value = selectedOption,
-                onValueChange = {},
-                label = { Text(label) },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor()
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                options.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        text = { Text(selectionOption) },
-                        onClick = {
-                            selectedOption = selectionOption
-                            expanded = false
-                            onSelected(selectionOption)
+                    MainScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        capturedImage = capturedImage,
+                        generatedPdfFile = generatedPdfFile,
+                        onCaptureImage = { openCamera() },
+                        onGeneratePdf = { formData ->
+                            formData.capturedImage = capturedImage
+                            generatePdf(formData)
+                        },
+                        onSharePdf = { file ->
+                            sharePdf(file)
                         }
                     )
                 }
@@ -172,111 +114,352 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Opens the camera to capture an image
+     */
     private fun openCamera() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions()
+            return
+        }
+
         try {
-            // Create an intent to capture an image
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
-            // Create a temporary file to store the image
+            // Create temporary file to store the image
             photoFile = createImageFile()
 
-            // Continue only if the file was created successfully
             photoFile?.let { file ->
                 val photoUri = FileProvider.getUriForFile(
                     this,
-                    "com.example.vastuarogyamvisit.provider",
+                    "${packageName}.provider",
                     file
                 )
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
                 captureImageLauncher.launch(intent)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Error opening camera: ${e.message}", Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "Error opening camera: ${e.message}")
+            Toast.makeText(this, "Error opening camera", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private val captureImageLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                photoFile?.let { file ->
-                    // Convert photoFile to Uri using FileProvider
-                    val photoUri = FileProvider.getUriForFile(
-                        this,
-                        "com.example.vastuarogyamvisit.provider",
-                        file
-                    )
-                    capturedImage = MediaStore.Images.Media.getBitmap(contentResolver, photoUri)
-                }
-            }
-        }
-
+    /**
+     * Creates a temporary file for storing the captured image
+     *
+     * @return File object for the temporary image
+     */
     private fun createImageFile(): File {
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        val storageDir = File(
+            getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+            FileConstants.IMAGE_DIRECTORY
+        )
+
+        if (!storageDir.exists()) {
+            storageDir.mkdirs()
+        }
+
+        return File(storageDir, "${FileConstants.IMAGE_FILE_PREFIX}${timeStamp}.jpg")
     }
 
-    // PDF generation logic
-    private fun generatePdf(name: String, email: String, phone: String, image: Bitmap?, selectedOption: String) {
-        try {
-//            val pdfFile = File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "visit_data.pdf")
-            val timestamp = System.currentTimeMillis()
-            val fileName = "user_data_$timestamp.pdf"
-            val pdfFile = File(getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
-            val pdfWriter = PdfWriter(pdfFile)
-            val pdfDocument = PdfDocument(pdfWriter)
-            val document = Document(pdfDocument)
+    /**
+     * Generates a PDF from the form data
+     *
+     * @param formData The form data to include in the PDF
+     */
+    private fun generatePdf(formData: VisitFormData) {
+        val pdfFile = PdfUtils.generatePdf(this, formData)
 
-            // Add text
-            document.add(Paragraph("Name: $name"))
-            document.add(Paragraph("Email: $email"))
-            document.add(Paragraph("Phone: $phone"))
-            document.add(Paragraph("Selected Option: $selectedOption"))
+        if (pdfFile != null) {
+            generatedPdfFile = pdfFile
+            Toast.makeText(
+                this,
+                "PDF Created: ${pdfFile.name}",
+                Toast.LENGTH_LONG
+            ).show()
 
-            // Add image if available
-            image?.let {
-                val imageData = ImageDataFactory.create(it.toByteArray())
-                val pdfImage = PdfImage(imageData).apply {
-                    scaleToFit(200f, 200f)
-                    setTextAlignment(TextAlignment.CENTER)
-                }
-                document.add(pdfImage)
-            }
-
-            document.close()
-
-            Toast.makeText(this, "PDF Created", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            e.printStackTrace()
+            // Optionally open the PDF
+            openPdf(pdfFile)
+        } else {
             Toast.makeText(this, "Error creating PDF", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun Bitmap.toByteArray(): ByteArray {
-        val byteArrayOutputStream = java.io.ByteArrayOutputStream()
-        this.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-        return byteArrayOutputStream.toByteArray()
+    /**
+     * Opens a PDF file with an external app
+     *
+     * @param file The PDF file to open
+     */
+    private fun openPdf(file: File) {
+        try {
+            val uri = FileProvider.getUriForFile(
+                this,
+                "${packageName}.provider",
+                file
+            )
+
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "application/pdf")
+                flags = Intent.FLAG_ACTIVITY_NO_HISTORY
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            if (intent.resolveActivity(packageManager) != null) {
+                startActivity(intent)
+            } else {
+                Toast.makeText(
+                    this,
+                    "No PDF viewer app found",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error opening PDF: ${e.message}")
+            Toast.makeText(this, "Error opening PDF", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    private fun requestPermissions() {
-        if (checkSelfPermission(android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-            checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(
-                arrayOf(
-                    android.Manifest.permission.CAMERA,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ),
-                100
+    /**
+     * Shares a PDF file with other apps
+     *
+     * @param file The PDF file to share
+     */
+    private fun sharePdf(file: File) {
+        try {
+            val uri = FileProvider.getUriForFile(
+                this,
+                "${packageName}.provider",
+                file
             )
+
+            val shareIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_STREAM, uri)
+                type = "application/pdf"
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            val chooserIntent = Intent.createChooser(shareIntent, "Share PDF Report")
+            startActivity(chooserIntent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error sharing PDF: ${e.message}")
+            Toast.makeText(this, "Error sharing PDF", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Requests necessary permissions for the app
+     */
+    private fun requestPermissions() {
+        val permissions = mutableListOf<String>()
+
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissions.add(android.Manifest.permission.CAMERA)
+        }
+
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED && android.os.Build.VERSION.SDK_INT <= 32
+        ) {
+            permissions.add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED && android.os.Build.VERSION.SDK_INT <= 32
+        ) {
+            permissions.add(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+
+        if (permissions.isNotEmpty()) {
+            requestPermissionLauncher.launch(permissions.toTypedArray())
         }
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    VastuArogyamVisitTheme {
-//        MainContent()
-//    }
-//}
+/**
+ * Main composable screen for the app
+ */
+@Composable
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    capturedImage: Bitmap?,
+    generatedPdfFile: File?,
+    onCaptureImage: () -> Unit,
+    onGeneratePdf: (VisitFormData) -> Unit,
+    onSharePdf: (File) -> Unit
+) {
+    // Form state
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+
+    // Dropdown selections
+    var selectedReportType by remember {
+        mutableStateOf(DropdownConstants.REPORT_TYPES.first())
+    }
+    var selectedPropertyType by remember {
+        mutableStateOf(DropdownConstants.PROPERTY_TYPES.first())
+    }
+    var selectedInspectionCategory by remember {
+        mutableStateOf(DropdownConstants.INSPECTION_CATEGORIES.first())
+    }
+    var selectedVisitPurpose by remember {
+        mutableStateOf(DropdownConstants.VISIT_PURPOSES.first())
+    }
+
+    // Scrollable content
+    val scrollState = rememberScrollState()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = "Vastu Arogyam Visit Form",
+            modifier = Modifier.align(Alignment.Start)
+        )
+
+        // Basic information fields
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = phone,
+            onValueChange = { phone = it },
+            label = { Text("Phone Number") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Dropdown selectors
+        Text(
+            text = "Select Report Details:",
+            modifier = Modifier.align(Alignment.Start)
+        )
+
+        // Report Type dropdown
+        DropdownSelector(
+            label = "Report Type",
+            options = DropdownConstants.REPORT_TYPES,
+            selectedOption = selectedReportType,
+            onOptionSelected = { selectedReportType = it },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Property Type dropdown
+        DropdownSelector(
+            label = "Property Type",
+            options = DropdownConstants.PROPERTY_TYPES,
+            selectedOption = selectedPropertyType,
+            onOptionSelected = { selectedPropertyType = it },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Inspection Category dropdown
+        DropdownSelector(
+            label = "Inspection Category",
+            options = DropdownConstants.INSPECTION_CATEGORIES,
+            selectedOption = selectedInspectionCategory,
+            onOptionSelected = { selectedInspectionCategory = it },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Visit Purpose dropdown
+        DropdownSelector(
+            label = "Visit Purpose",
+            options = DropdownConstants.VISIT_PURPOSES,
+            selectedOption = selectedVisitPurpose,
+            onOptionSelected = { selectedVisitPurpose = it },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Notes field
+        OutlinedTextField(
+            value = notes,
+            onValueChange = { notes = it },
+            label = { Text("Additional Notes") },
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = 5
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Capture Image Button
+        Button(
+            onClick = onCaptureImage,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Capture Image")
+        }
+
+        // Display captured image
+        capturedImage?.let {
+            Image(
+                bitmap = it.asImageBitmap(),
+                contentDescription = "Captured Image",
+                modifier = Modifier
+                    .size(200.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+        }
+
+        // Generate PDF button
+        Button(
+            onClick = {
+                val formData = VisitFormData(
+                    name = name,
+                    email = email,
+                    phone = phone,
+                    reportType = selectedReportType,
+                    propertyType = selectedPropertyType,
+                    inspectionCategory = selectedInspectionCategory,
+                    visitPurpose = selectedVisitPurpose,
+                    notes = notes
+                )
+                onGeneratePdf(formData)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Generate PDF")
+        }
+
+        generatedPdfFile?.let { pdfFile ->
+            Button(
+                onClick = { onSharePdf(pdfFile) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Share PDF")
+            }
+        }
+
+        // Add some space at the bottom for better scrolling experience
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
