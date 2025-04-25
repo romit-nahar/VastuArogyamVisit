@@ -10,6 +10,8 @@ lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
 composeBom = "2024.04.01"
 composeFoundation = "1.4.0"
+compose = "1.5.1"
+material3 = "1.2.1"
 uiTooling = "1.7.6"
 uiToolingPreview = "1.7.6"
 
@@ -32,6 +34,16 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-compose-foundation = { group = "androidx.wear.compose", name = "compose-foundation", version.ref = "composeFoundation" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
+
+androidx-compose-ui = "androidx.compose.ui:ui:1.5.1"
+androidx-compose-ui-graphics = "androidx.compose.ui:ui-graphics:1.5.1"
+androidx-compose-ui-tooling-preview = "androidx.compose.ui:ui-tooling-preview:1.5.1"
+androidx-compose-ui-tooling = "androidx.compose.ui:ui-tooling:1.5.1"
+androidx-compose-ui-test-junit4 = "androidx.compose.ui:ui-test-junit4:1.5.1"
+androidx-compose-ui-test-manifest = "androidx.compose.ui:ui-test-manifest:1.5.1"
+
+[bundles]
+compose-ui = ["androidx-compose-ui", "androidx-compose-foundation", "androidx-compose-ui-graphics", "androidx-compose-ui-tooling-preview"]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
