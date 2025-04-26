@@ -3,7 +3,6 @@ package com.example.vastuarogyamvisit
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -27,7 +26,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Share
@@ -39,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -48,12 +45,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.example.vastuarogyamvisit.model.VisitFormData
 import com.example.vastuarogyamvisit.ui.components.DropdownSelector
+import com.example.vastuarogyamvisit.ui.components.SignPercentageDropdownSelector
 import com.example.vastuarogyamvisit.ui.components.ValidatedTextField
 import com.example.vastuarogyamvisit.ui.theme.VastuArogyamVisitTheme
-import com.example.vastuarogyamvisit.utils.DropdownConstants
 import com.example.vastuarogyamvisit.utils.FileConstants
 import com.example.vastuarogyamvisit.utils.PdfUtils
-import com.example.vastuarogyamvisit.utils.PermissionConstants
+import com.example.vastuarogyamvisit.utils.VastuDropdownConstants
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -337,24 +334,43 @@ fun MainScreen(
     var phone by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
 
+    var selectedSignSpandan by remember { mutableStateOf("+") }
+    var selectedPercentageSpandan by remember { mutableStateOf("0%") }
+
     // Field validation state
     var nameError by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
     var phoneError by remember { mutableStateOf(false) }
 
     // Dropdown selections
-    var selectedReportType by remember {
-        mutableStateOf(DropdownConstants.REPORT_TYPES.first())
+    var selectedVastubhoomidosh by remember {
+        mutableStateOf(VastuDropdownConstants.VASTUBHOOMIDOSH.first())
     }
-    var selectedPropertyType by remember {
-        mutableStateOf(DropdownConstants.PROPERTY_TYPES.first())
+    var selectedRahnyasYogya by remember {
+        mutableStateOf(VastuDropdownConstants.RAHNYAS_YOGYA.first())
     }
-    var selectedInspectionCategory by remember {
-        mutableStateOf(DropdownConstants.INSPECTION_CATEGORIES.first())
+    var selectedShalyaDosh by remember {
+        mutableStateOf(VastuDropdownConstants.SHALYA_DOSH.first())
     }
-    var selectedVisitPurpose by remember {
-        mutableStateOf(DropdownConstants.VISIT_PURPOSES.first())
+    var selectedEntity by remember {
+        mutableStateOf(VastuDropdownConstants.ENTITY.first())
     }
+    var selectedGS by remember {
+        mutableStateOf(VastuDropdownConstants.GS.first())
+    }
+    var selectedMaanviyaDosh by remember {
+        mutableStateOf(VastuDropdownConstants.MAANVIYA_DOSH.first())
+    }
+    var selectedAmaanviyaDosh by remember {
+        mutableStateOf(VastuDropdownConstants.AMAANVIYA_DOSH.first())
+    }
+    var selectedGharatilVastavyaSpandane by remember {
+        mutableStateOf(VastuDropdownConstants.GHARATIL_VASTAVYA_SPANDANE.first())
+    }
+    var selectedJastitJastKamitKamiDosh by remember {
+        mutableStateOf(VastuDropdownConstants.JASTIT_JAST_KAMIT_KAMI_DOSH.first())
+    }
+
 
     // Scrollable content
     val scrollState = rememberScrollState()
@@ -444,7 +460,7 @@ fun MainScreen(
             }
         }
 
-        // Report Details Card
+        // Dowsing Details Card
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -456,46 +472,103 @@ fun MainScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    "Report Details",
+                    "Dowsing",
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
-                // Report Type dropdown
-                DropdownSelector(
-                    label = "Report Type",
-                    options = DropdownConstants.REPORT_TYPES,
-                    selectedOption = selectedReportType,
-                    onOptionSelected = { selectedReportType = it },
+                // Spandan dropdown
+                SignPercentageDropdownSelector(
+                    label = "स्पंदन",
+                    selectedSign = selectedSignSpandan,
+                    onSignSelected = { selectedSignSpandan = it },
+                    selectedPercentage = selectedPercentageSpandan,
+                    onPercentageSelected = { selectedPercentageSpandan = it },
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Property Type dropdown
+                // Rahnyas dropdown
                 DropdownSelector(
-                    label = "Property Type",
-                    options = DropdownConstants.PROPERTY_TYPES,
-                    selectedOption = selectedPropertyType,
-                    onOptionSelected = { selectedPropertyType = it },
+                    label = "राहण्यास योग्य",
+                    options = VastuDropdownConstants.RAHNYAS_YOGYA,
+                    selectedOption = selectedRahnyasYogya,
+                    onOptionSelected = { selectedRahnyasYogya = it },
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Inspection Category dropdown
+                // Vastubhoomidosh dropdown
                 DropdownSelector(
-                    label = "Inspection Category",
-                    options = DropdownConstants.INSPECTION_CATEGORIES,
-                    selectedOption = selectedInspectionCategory,
-                    onOptionSelected = { selectedInspectionCategory = it },
+                    label = "वास्तुभूमिदोष",
+                    options = VastuDropdownConstants.VASTUBHOOMIDOSH,
+                    selectedOption = selectedVastubhoomidosh,
+                    onOptionSelected = { selectedVastubhoomidosh = it },
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Visit Purpose dropdown
+                //  Shalya dropdown
                 DropdownSelector(
-                    label = "Visit Purpose",
-                    options = DropdownConstants.VISIT_PURPOSES,
-                    selectedOption = selectedVisitPurpose,
-                    onOptionSelected = { selectedVisitPurpose = it },
+                    label = "शल्य दोष",
+                    options = VastuDropdownConstants.SHALYA_DOSH,
+                    selectedOption = selectedShalyaDosh,
+                    onOptionSelected = { selectedShalyaDosh = it },
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                // Entity Dropdown
+                DropdownSelector(
+                    label = "Entity",
+                    options = VastuDropdownConstants.ENTITY,
+                    selectedOption = selectedEntity,
+                    onOptionSelected = { selectedEntity = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // GS Dropdown
+                DropdownSelector(
+                    label = "GS",
+                    options = VastuDropdownConstants.GS,
+                    selectedOption = selectedGS,
+                    onOptionSelected = { selectedGS = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Maanviya Dosh Dropdown
+                DropdownSelector(
+                    label = "मानवीय दोष",
+                    options = VastuDropdownConstants.MAANVIYA_DOSH,
+                    selectedOption = selectedMaanviyaDosh,
+                    onOptionSelected = { selectedMaanviyaDosh = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Amaanviya Dosh Dropdown
+                DropdownSelector(
+                    label = "अमानवीय दोष",
+                    options = VastuDropdownConstants.AMAANVIYA_DOSH,
+                    selectedOption = selectedAmaanviyaDosh,
+                    onOptionSelected = { selectedAmaanviyaDosh = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Gharatil Vastavya Spandane Dropdown
+                DropdownSelector(
+                    label = "घरातील वास्तव्य स्पंदने",
+                    options = VastuDropdownConstants.GHARATIL_VASTAVYA_SPANDANE,
+                    selectedOption = selectedGharatilVastavyaSpandane,
+                    onOptionSelected = { selectedGharatilVastavyaSpandane = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Jastit Jast Kamit Kamii Dosh Dropdown
+
+                DropdownSelector(
+                    label = "जास्तीत जास्त, कमीत कमी दोष",
+                    options = VastuDropdownConstants.JASTIT_JAST_KAMIT_KAMI_DOSH,
+                    selectedOption = selectedJastitJastKamitKamiDosh,
+                    onOptionSelected = { selectedJastitJastKamitKamiDosh = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
 
                 // Notes field
                 OutlinedTextField(
@@ -676,13 +749,26 @@ fun MainScreen(
 
                             if (!nameError && !emailError && !phoneError) {
                                 val formData = VisitFormData(
+                                    // Personal Information
                                     name = name,
                                     email = email,
                                     phone = phone,
-                                    reportType = selectedReportType,
-                                    propertyType = selectedPropertyType,
-                                    inspectionCategory = selectedInspectionCategory,
-                                    visitPurpose = selectedVisitPurpose,
+
+                                    // Dowsing
+                                    spandan = selectedSignSpandan + selectedPercentageSpandan,
+                                    vastuBhoomiDosh = selectedVastubhoomidosh,
+                                    rahnyasYogya = selectedRahnyasYogya,
+                                    shalyaDosh = selectedShalyaDosh,
+                                    entity = selectedEntity,
+                                    gs = selectedGS,
+                                    maanviyaDosh = selectedMaanviyaDosh,
+                                    amaanviyaDosh = selectedAmaanviyaDosh,
+                                    gharatilVastavyaSpandane = selectedGharatilVastavyaSpandane,
+                                    jastitJastKamitKamiDosh = selectedJastitJastKamitKamiDosh,
+
+
+                                    // Micro Energies
+
                                     notes = notes
                                 )
                                 onGeneratePdf(formData)
