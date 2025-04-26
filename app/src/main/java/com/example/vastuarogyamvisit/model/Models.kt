@@ -7,9 +7,19 @@ import java.io.Serializable
  * Data class representing user input form data
  */
 data class VisitFormData(
+    // Site Information
     val name: String = "",
     val email: String = "",
     val phone: String = "",
+    val address: String = "",
+    val area: String = "",
+    val north: String = "",
+    val open: String = "",
+    val close: String = "",
+    val road: String = "",
+    val startedYear: String = "",
+    val extYear: String = "",
+
     // Dowsing
     val spandan: String = "",
     val rahnyasYogya: String = "",

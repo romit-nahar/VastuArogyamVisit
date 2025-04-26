@@ -39,8 +39,7 @@ object PdfUtils {
     fun generatePdf(context: Context, formData: VisitFormData): File? {
         try {
             // Create timestamp for unique filename
-            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-            val fileName = "${FileConstants.PDF_FILE_PREFIX}${timestamp}.pdf"
+            val fileName = "${formData.name}.pdf"
 
             // Create directory if it doesn't exist
             val storageDir = File(
@@ -92,6 +91,14 @@ object PdfUtils {
             addTableRow(table, "Name", formData.name, devanagariFont)
             addTableRow(table, "Email", formData.email, devanagariFont)
             addTableRow(table, "Phone", formData.phone, devanagariFont)
+            addTableRow(table, "Address", formData.address, devanagariFont)
+            addTableRow(table, "Area", formData.area, devanagariFont)
+            addTableRow(table, "North", formData.north, devanagariFont)
+            addTableRow(table, "Open", formData.open, devanagariFont)
+            addTableRow(table, "Close", formData.close, devanagariFont)
+            addTableRow(table, "Road", formData.road, devanagariFont)
+            addTableRow(table, "Started Year", formData.startedYear, devanagariFont)
+            addTableRow(table, "Extension Year", formData.extYear, devanagariFont)
 
             // Dowsing
             addTableRow(table, "वास्तुतील स्पंदने", formData.spandan, devanagariFont, true)
@@ -106,7 +113,14 @@ object PdfUtils {
             addTableRow(table, "जास्तीत जास्त/कमीत कमी दोष", formData.jastitJastKamitKamiDosh, devanagariFont, true)
 
             // Micro Energies
-
+            addTableRow(table, "धनआकर्षण", formData.dhanaakarshan, devanagariFont, true)
+            addTableRow(table, "सुख", formData.sukh, devanagariFont, true)
+            addTableRow(table, "आरोग्य", formData.aarogya, devanagariFont, true)
+            addTableRow(table, "ऐश्वर्य", formData.aishwary, devanagariFont, true)
+            addTableRow(table, "यश मत्सर", formData.yashmatsar, devanagariFont, true)
+            addTableRow(table, "ग्राहक आकर्षण", formData.grahakAakarshan, devanagariFont, true)
+            addTableRow(table, "ग्राहक समाधान", formData.grahakAakarshan, devanagariFont, true)
+            addTableRow(table, "परस्पर संबंध", formData.parasparSambandh, devanagariFont, true)
 
             addTableRow(table, "Notes", formData.notes, devanagariFont)
 

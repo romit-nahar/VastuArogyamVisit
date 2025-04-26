@@ -8,11 +8,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun SignToggleSelector(
@@ -20,31 +22,39 @@ fun SignToggleSelector(
     onSignSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
+    Box(
+        modifier = modifier
+            .height(48.dp)
+            .clip(MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        listOf("+", "-").forEach { sign ->
-            val isSelected = selectedSign == sign
-            Text(
-                text = sign,
-                modifier = Modifier
-                    .padding(4.dp)
-                    .weight(1f)
-                    .height(48.dp)
-                    .background(
-                        color = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color.Transparent,
-                        shape = MaterialTheme.shapes.small
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            listOf("+", "-").forEach { sign ->
+                val isSelected = selectedSign == sign
+                Text(
+                    text = sign,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .weight(1f)
+                        .height(40.dp)
+                        .background(
+                            color = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color.Transparent,
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .clickable { onSignSelected(sign) }
+                        .wrapContentHeight(Alignment.CenterVertically),
+                    style = TextStyle(
+                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        textAlign = TextAlign.Center,
+                        fontSize = 24.sp
                     )
-                    .clickable { onSignSelected(sign) }
-                    .wrapContentHeight(Alignment.CenterVertically),
-                style = TextStyle(
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    textAlign = TextAlign.Center
                 )
-            )
+            }
         }
     }
 }

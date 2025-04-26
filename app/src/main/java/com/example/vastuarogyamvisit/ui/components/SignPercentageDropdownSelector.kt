@@ -3,9 +3,11 @@ package com.example.vastuarogyamvisit.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.vastuarogyamvisit.utils.VastuDropdownConstants.PERCENTAGE
 
 @Composable
@@ -22,22 +24,25 @@ fun SignPercentageDropdownSelector(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Sign dropdown (+ / -)
             SignToggleSelector(
                 selectedSign = selectedSign,
                 onSignSelected = onSignSelected,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .height(56.dp)
             )
 
-            // Percentage dropdown (0%, 5%, ..., 100%)
             DropdownSelector(
-                label = "Percentage",
+                label = "",
                 options = PERCENTAGE,
                 selectedOption = selectedPercentage,
                 onOptionSelected = onPercentageSelected,
-                modifier = Modifier.weight(2f)
+                modifier = Modifier
+                    .weight(2f)
+                    .height(56.dp)
             )
         }
     }

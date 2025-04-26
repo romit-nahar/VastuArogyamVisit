@@ -23,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.vastuarogyamvisit.ui.theme.VastuArogyamVisitTheme
-import com.example.vastuarogyamvisit.utils.DropdownConstants
 import com.example.vastuarogyamvisit.utils.FontConstants
 import com.example.vastuarogyamvisit.utils.VastuDropdownConstants
 
@@ -64,49 +63,46 @@ fun DropdownSelector(
     }
 
     Column(modifier = modifier) {
-        // Bold and padded label
-        Text(
-            text = label,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+        if (label.isNotEmpty()) {
+            Text(
+                text = label,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
 
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded },
-            modifier = modifier
+            modifier = Modifier.fillMaxWidth()  // Add this
         ) {
             TextField(
                 readOnly = true,
                 value = selectedOption,
                 onValueChange = {},
-                label = { Text(label) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxWidth(),
-                // Apply Devanagari font if needed and available
                 textStyle = if (isDevanagari && devanagariFont != null) {
                     androidx.compose.ui.text.TextStyle(fontFamily = devanagariFont)
                 } else {
                     androidx.compose.ui.text.TextStyle()
-                }
+                },
+                singleLine = true
             )
+
             ExposedDropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(
                         text = {
                             Text(
                                 text = option,
-                                // Apply Devanagari font if needed and available
-                                fontFamily = if (isDevanagari && devanagariFont != null) {
-                                    devanagariFont
-                                } else {
-                                    null
-                                }
+                                fontFamily = if (isDevanagari && devanagariFont != null) devanagariFont else null
                             )
                         },
                         onClick = {

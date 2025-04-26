@@ -328,10 +328,19 @@ fun MainScreen(
     onOpenPdf: (File) -> Unit,
     onSharePdf: (File) -> Unit
 ) {
-    // Form state
+    // Site Information
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("") }
+    var area by remember { mutableStateOf("") }
+    var north by remember { mutableStateOf("") }
+    var open by remember { mutableStateOf("") }
+    var close by remember { mutableStateOf("") }
+    var road by remember { mutableStateOf("") }
+    var startedYear by remember { mutableStateOf("") }
+    var extYear by remember { mutableStateOf("") }
+
     var notes by remember { mutableStateOf("") }
 
     var selectedSignSpandan by remember { mutableStateOf("+") }
@@ -342,7 +351,7 @@ fun MainScreen(
     var emailError by remember { mutableStateOf(false) }
     var phoneError by remember { mutableStateOf(false) }
 
-    // Dropdown selections
+    // Dowsing selections
     var selectedVastubhoomidosh by remember {
         mutableStateOf(VastuDropdownConstants.VASTUBHOOMIDOSH.first())
     }
@@ -371,6 +380,24 @@ fun MainScreen(
         mutableStateOf(VastuDropdownConstants.JASTIT_JAST_KAMIT_KAMI_DOSH.first())
     }
 
+    // Micro Energies selections
+    var selectedSignDhanAakarshan by remember { mutableStateOf("+") }
+    var selectedPercentageDhanAakarshan by remember { mutableStateOf("0%") }
+    var selectedSignSukh by remember { mutableStateOf("+") }
+    var selectedPercentageSukh by remember { mutableStateOf("0%") }
+    var selectedSignAarogya by remember { mutableStateOf("+") }
+    var selectedPercentageAarogya by remember { mutableStateOf("0%") }
+    var selectedSignAishwary by remember { mutableStateOf("+") }
+    var selectedPercentageAishwary by remember { mutableStateOf("0%") }
+    var selectedSignYashmatsar by remember { mutableStateOf("+") }
+    var selectedPercentageYashmatsar by remember { mutableStateOf("0%") }
+    var selectedSignGrahakAakarshan by remember { mutableStateOf("+") }
+    var selectedPercentageGrahakAakarshan by remember { mutableStateOf("0%") }
+    var selectedSignGrahakSamadhan by remember { mutableStateOf("+") }
+    var selectedPercentageGrahakSamadhan by remember { mutableStateOf("0%") }
+    var selectedSignParasparSambandh by remember { mutableStateOf("+") }
+    var selectedPercentageParasparSambandh by remember { mutableStateOf("0%") }
+
 
     // Scrollable content
     val scrollState = rememberScrollState()
@@ -398,7 +425,7 @@ fun MainScreen(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    "Property Inspection Reports",
+                    "Energy Inspection Report",
                     fontSize = 14.sp,
                     fontStyle = FontStyle.Italic
                 )
@@ -417,7 +444,7 @@ fun MainScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    "Contact Information",
+                    "Site Information",
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -456,6 +483,70 @@ fun MainScreen(
                     isError = phoneError,
                     errorMessage = if (phoneError) "Phone should contain only digits" else null,
                     modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = address,
+                    onValueChange = { address = it },
+                    label = { Text("Address") },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 5
+                )
+
+                OutlinedTextField(
+                    value = area,
+                    onValueChange = { area = it },
+                    label = { Text("Area") },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 5
+                )
+
+                OutlinedTextField(
+                    value = north,
+                    onValueChange = { north = it },
+                    label = { Text("North") },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 5
+                )
+
+                OutlinedTextField(
+                    value = open,
+                    onValueChange = { open = it },
+                    label = { Text("Open") },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 5
+                )
+
+                OutlinedTextField(
+                    value = close,
+                    onValueChange = { close = it },
+                    label = { Text("Close") },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 5
+                )
+
+                OutlinedTextField(
+                    value = road,
+                    onValueChange = { road = it },
+                    label = { Text("Road") },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 5
+                )
+
+                OutlinedTextField(
+                    value = startedYear,
+                    onValueChange = { startedYear = it },
+                    label = { Text("Started Year")},
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 5
+                )
+
+                OutlinedTextField(
+                    value = extYear,
+                    onValueChange = { extYear = it },
+                    label = { Text("Extension Year")},
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 5
                 )
             }
         }
@@ -568,7 +659,124 @@ fun MainScreen(
                     onOptionSelected = { selectedJastitJastKamitKamiDosh = it },
                     modifier = Modifier.fillMaxWidth()
                 )
+            }
+        }
 
+        // Micro Energies Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    "Micro Energies",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                // Dhan Aakarshan percentage
+                SignPercentageDropdownSelector(
+                    label = "धनआकर्षण",
+                    selectedSign = selectedSignDhanAakarshan,
+                    onSignSelected = { selectedSignDhanAakarshan = it },
+                    selectedPercentage = selectedPercentageDhanAakarshan,
+                    onPercentageSelected = { selectedPercentageDhanAakarshan = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Sukh percentage
+                SignPercentageDropdownSelector(
+                    label = "सुख",
+                    selectedSign = selectedSignSukh,
+                    onSignSelected = { selectedSignSukh = it },
+                    selectedPercentage = selectedPercentageSukh,
+                    onPercentageSelected = { selectedPercentageSukh = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Aarogya percentage
+                SignPercentageDropdownSelector(
+                    label = "आरोग्य",
+                    selectedSign = selectedSignAarogya,
+                    onSignSelected = { selectedSignAarogya = it },
+                    selectedPercentage = selectedPercentageAarogya,
+                    onPercentageSelected = { selectedPercentageAarogya = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Aishwary percentage
+                SignPercentageDropdownSelector(
+                    label = "ऐश्वर्य",
+                    selectedSign = selectedSignAishwary,
+                    onSignSelected = { selectedSignAishwary = it },
+                    selectedPercentage = selectedPercentageAishwary,
+                    onPercentageSelected = { selectedPercentageAishwary = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Yashmatsar percentage
+                SignPercentageDropdownSelector(
+                    label = "यश मत्सर",
+                    selectedSign = selectedSignYashmatsar,
+                    onSignSelected = { selectedSignYashmatsar = it },
+                    selectedPercentage = selectedPercentageYashmatsar,
+                    onPercentageSelected = { selectedPercentageYashmatsar = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Grahak Aakarshan percentage
+                SignPercentageDropdownSelector(
+                    label = "ग्राहक आकर्षण",
+                    selectedSign = selectedSignGrahakAakarshan,
+                    onSignSelected = { selectedSignGrahakAakarshan = it },
+                    selectedPercentage = selectedPercentageGrahakAakarshan,
+                    onPercentageSelected = { selectedPercentageGrahakAakarshan = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Grahak Samadhan percentage
+                SignPercentageDropdownSelector(
+                    label = "ग्राहक समाधान",
+                    selectedSign = selectedSignGrahakSamadhan,
+                    onSignSelected = { selectedSignGrahakSamadhan = it },
+                    selectedPercentage = selectedPercentageGrahakSamadhan,
+                    onPercentageSelected = { selectedPercentageGrahakSamadhan = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Paraspar Sambandh percentage
+                SignPercentageDropdownSelector(
+                    label = "परस्पर संबंध",
+                    selectedSign = selectedSignParasparSambandh,
+                    onSignSelected = { selectedSignParasparSambandh = it },
+                    selectedPercentage = selectedPercentageParasparSambandh,
+                    onPercentageSelected = { selectedPercentageParasparSambandh = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        // Additonal Notes Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    "Additional Notes",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
 
                 // Notes field
                 OutlinedTextField(
@@ -576,7 +784,6 @@ fun MainScreen(
                     onValueChange = { notes = it },
                     label = { Text("Additional Notes") },
                     modifier = Modifier.fillMaxWidth(),
-                    maxLines = 5
                 )
             }
         }
@@ -749,10 +956,18 @@ fun MainScreen(
 
                             if (!nameError && !emailError && !phoneError) {
                                 val formData = VisitFormData(
-                                    // Personal Information
+                                    // Site Information
                                     name = name,
                                     email = email,
                                     phone = phone,
+                                    address = address,
+                                    area = area,
+                                    north = north,
+                                    open = open,
+                                    close = close,
+                                    road = road,
+                                    startedYear = startedYear,
+                                    extYear = extYear,
 
                                     // Dowsing
                                     spandan = selectedSignSpandan + selectedPercentageSpandan,
@@ -768,7 +983,16 @@ fun MainScreen(
 
 
                                     // Micro Energies
+                                    dhanaakarshan = selectedSignDhanAakarshan + selectedPercentageDhanAakarshan,
+                                    sukh = selectedSignSukh + selectedPercentageSukh,
+                                    aarogya = selectedSignAarogya + selectedPercentageAarogya,
+                                    aishwary = selectedSignAishwary + selectedPercentageAishwary,
+                                    yashmatsar = selectedSignYashmatsar + selectedPercentageYashmatsar,
+                                    grahakAakarshan = selectedSignGrahakAakarshan + selectedPercentageGrahakAakarshan,
+                                    grahakSamadhan = selectedSignGrahakSamadhan + selectedPercentageGrahakSamadhan,
+                                    parasparSambandh = selectedSignParasparSambandh + selectedPercentageParasparSambandh,
 
+                                    // Additional Notes
                                     notes = notes
                                 )
                                 onGeneratePdf(formData)
