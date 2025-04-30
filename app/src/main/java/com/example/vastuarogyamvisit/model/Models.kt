@@ -41,6 +41,18 @@ data class VisitFormData(
     val grahakAakarshan: String = "",
     val grahakSamadhan: String = "",
     val parasparSambandh: String = "",
+    val annapurna: String = "",
+    val vanshVriddhi: String = "",
+
+    // Lecher Antenna
+    val lecher176: String = "Positive",
+    val lecher33: String = "Positive",
+    val lecher42: String = "Positive",
+    val lecher66: String = "Positive",
+    val lecher80: String = "Positive",
+    val lecher86: String = "Positive",
+    val lecher180: String = "Positive",
+    val lecher130: String = "Positive",
 
     val notes: String = "",
     var capturedImage: Bitmap? = null

@@ -100,28 +100,45 @@ object PdfUtils {
             addTableRow(table, "Started Year", formData.startedYear, devanagariFont)
             addTableRow(table, "Extension Year", formData.extYear, devanagariFont)
 
-            // Dowsing
-            addTableRow(table, "वास्तुतील स्पंदने", formData.spandan, devanagariFont, true)
+            // Add Dowsing section
+            document.add(Paragraph("\nDowsing").setBold())
+            addTableRow(table, "स्पंदन", formData.spandan, devanagariFont, true)
             addTableRow(table, "राहण्यास योग्य", formData.rahnyasYogya, devanagariFont, true)
             addTableRow(table, "वास्तुभूमिदोष", formData.vastuBhoomiDosh, devanagariFont, true)
             addTableRow(table, "शल्य दोष", formData.shalyaDosh, devanagariFont, true)
-            addTableRow(table, "Entity", formData.entity, devanagariFont, true)
-            // GS
+            addTableRow(table, "Entity", formData.entity, devanagariFont)
+            addTableRow(table, "GS", formData.gs, devanagariFont)
             addTableRow(table, "मानवीय दोष", formData.maanviyaDosh, devanagariFont, true)
             addTableRow(table, "अमानवीय दोष", formData.amaanviyaDosh, devanagariFont, true)
-            addTableRow(table, "घरातीत वास्तव्य स्पंदने", formData.gharatilVastavyaSpandane, devanagariFont, true)
-            addTableRow(table, "जास्तीत जास्त/कमीत कमी दोष", formData.jastitJastKamitKamiDosh, devanagariFont, true)
+            addTableRow(table, "घरातील वास्तव्य स्पंदने", formData.gharatilVastavyaSpandane, devanagariFont, true)
+            addTableRow(table, "जास्तीत जास्त, कमीत कमी दोष", formData.jastitJastKamitKamiDosh, devanagariFont, true)
 
-            // Micro Energies
+            // Add Micro Energies section
+            document.add(Paragraph("\nMicro Energies").setBold())
             addTableRow(table, "धनआकर्षण", formData.dhanaakarshan, devanagariFont, true)
             addTableRow(table, "सुख", formData.sukh, devanagariFont, true)
             addTableRow(table, "आरोग्य", formData.aarogya, devanagariFont, true)
             addTableRow(table, "ऐश्वर्य", formData.aishwary, devanagariFont, true)
             addTableRow(table, "यश मत्सर", formData.yashmatsar, devanagariFont, true)
             addTableRow(table, "ग्राहक आकर्षण", formData.grahakAakarshan, devanagariFont, true)
-            addTableRow(table, "ग्राहक समाधान", formData.grahakAakarshan, devanagariFont, true)
+            addTableRow(table, "ग्राहक समाधान", formData.grahakSamadhan, devanagariFont, true)
             addTableRow(table, "परस्पर संबंध", formData.parasparSambandh, devanagariFont, true)
+            addTableRow(table, "अन्नपूर्णा", formData.annapurna, devanagariFont, true)
+            addTableRow(table, "वंशवृद्धी", formData.vanshVriddhi, devanagariFont, true)
 
+            // Add Lecher Antenna section
+            document.add(Paragraph("\nLecher Antenna").setBold())
+            addTableRow(table, "17.6 MHz", formData.lecher176, devanagariFont)
+            addTableRow(table, "3.3 MHz", formData.lecher33, devanagariFont)
+            addTableRow(table, "4.2 MHz", formData.lecher42, devanagariFont)
+            addTableRow(table, "6.6 MHz", formData.lecher66, devanagariFont)
+            addTableRow(table, "8.0 MHz", formData.lecher80, devanagariFont)
+            addTableRow(table, "8.6 MHz", formData.lecher86, devanagariFont)
+            addTableRow(table, "18.0 MHz", formData.lecher180, devanagariFont)
+            addTableRow(table, "13.0 MHz", formData.lecher130, devanagariFont)
+
+            // Add Notes section
+            document.add(Paragraph("\nAdditional Notes").setBold())
             addTableRow(table, "Notes", formData.notes, devanagariFont)
 
             document.add(table)

@@ -397,7 +397,20 @@ fun MainScreen(
     var selectedPercentageGrahakSamadhan by remember { mutableStateOf("0%") }
     var selectedSignParasparSambandh by remember { mutableStateOf("+") }
     var selectedPercentageParasparSambandh by remember { mutableStateOf("0%") }
+    var selectedSignAnnapurna by remember { mutableStateOf("+") }
+    var selectedPercentageAnnapurna by remember { mutableStateOf("0%") }
+    var selectedSignVanshVriddhi by remember { mutableStateOf("+") }
+    var selectedPercentageVanshVriddhi by remember { mutableStateOf("0%") }
 
+    // Lecher Antenna selections
+    var selectedLecher176 by remember { mutableStateOf("Positive") }
+    var selectedLecher33 by remember { mutableStateOf("Positive") }
+    var selectedLecher42 by remember { mutableStateOf("Positive") }
+    var selectedLecher66 by remember { mutableStateOf("Positive") }
+    var selectedLecher80 by remember { mutableStateOf("Positive") }
+    var selectedLecher86 by remember { mutableStateOf("Positive") }
+    var selectedLecher180 by remember { mutableStateOf("Positive") }
+    var selectedLecher130 by remember { mutableStateOf("Positive") }
 
     // Scrollable content
     val scrollState = rememberScrollState()
@@ -758,6 +771,110 @@ fun MainScreen(
                     onPercentageSelected = { selectedPercentageParasparSambandh = it },
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                // Annapurna percentage
+                SignPercentageDropdownSelector(
+                    label = "अन्नपूर्णा",
+                    selectedSign = selectedSignAnnapurna,
+                    onSignSelected = { selectedSignAnnapurna = it },
+                    selectedPercentage = selectedPercentageAnnapurna,
+                    onPercentageSelected = { selectedPercentageAnnapurna = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Vansh Vriddhi percentage
+                SignPercentageDropdownSelector(
+                    label = "वंशवृद्धी",
+                    selectedSign = selectedSignVanshVriddhi,
+                    onSignSelected = { selectedSignVanshVriddhi = it },
+                    selectedPercentage = selectedPercentageVanshVriddhi,
+                    onPercentageSelected = { selectedPercentageVanshVriddhi = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        // Lecher Antenna Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    "Lecher Antenna",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                // Lecher Antenna fields
+                DropdownSelector(
+                    label = "17.6",
+                    options = listOf("Positive", "Negative"),
+                    selectedOption = selectedLecher176,
+                    onOptionSelected = { selectedLecher176 = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                DropdownSelector(
+                    label = "3.3",
+                    options = listOf("Positive", "Negative"),
+                    selectedOption = selectedLecher33,
+                    onOptionSelected = { selectedLecher33 = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                DropdownSelector(
+                    label = "4.2",
+                    options = listOf("Positive", "Negative"),
+                    selectedOption = selectedLecher42,
+                    onOptionSelected = { selectedLecher42 = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                DropdownSelector(
+                    label = "6.6",
+                    options = listOf("Positive", "Negative"),
+                    selectedOption = selectedLecher66,
+                    onOptionSelected = { selectedLecher66 = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                DropdownSelector(
+                    label = "8.0",
+                    options = listOf("Positive", "Negative"),
+                    selectedOption = selectedLecher80,
+                    onOptionSelected = { selectedLecher80 = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                DropdownSelector(
+                    label = "8.6",
+                    options = listOf("Positive", "Negative"),
+                    selectedOption = selectedLecher86,
+                    onOptionSelected = { selectedLecher86 = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                DropdownSelector(
+                    label = "18.0",
+                    options = listOf("Positive", "Negative"),
+                    selectedOption = selectedLecher180,
+                    onOptionSelected = { selectedLecher180 = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                DropdownSelector(
+                    label = "13.0",
+                    options = listOf("Positive", "Negative"),
+                    selectedOption = selectedLecher130,
+                    onOptionSelected = { selectedLecher130 = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
 
@@ -981,7 +1098,6 @@ fun MainScreen(
                                     gharatilVastavyaSpandane = selectedGharatilVastavyaSpandane,
                                     jastitJastKamitKamiDosh = selectedJastitJastKamitKamiDosh,
 
-
                                     // Micro Energies
                                     dhanaakarshan = selectedSignDhanAakarshan + selectedPercentageDhanAakarshan,
                                     sukh = selectedSignSukh + selectedPercentageSukh,
@@ -991,6 +1107,18 @@ fun MainScreen(
                                     grahakAakarshan = selectedSignGrahakAakarshan + selectedPercentageGrahakAakarshan,
                                     grahakSamadhan = selectedSignGrahakSamadhan + selectedPercentageGrahakSamadhan,
                                     parasparSambandh = selectedSignParasparSambandh + selectedPercentageParasparSambandh,
+                                    annapurna = selectedSignAnnapurna + selectedPercentageAnnapurna,
+                                    vanshVriddhi = selectedSignVanshVriddhi + selectedPercentageVanshVriddhi,
+
+                                    // Lecher Antenna
+                                    lecher176 = selectedLecher176,
+                                    lecher33 = selectedLecher33,
+                                    lecher42 = selectedLecher42,
+                                    lecher66 = selectedLecher66,
+                                    lecher80 = selectedLecher80,
+                                    lecher86 = selectedLecher86,
+                                    lecher180 = selectedLecher180,
+                                    lecher130 = selectedLecher130,
 
                                     // Additional Notes
                                     notes = notes
